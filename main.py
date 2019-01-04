@@ -19,8 +19,8 @@ media = "bread_test.mp4"
 video_out = "output.avi"
 dt = desktop("images/bg.jpg", "images/bgClick.jpg")
 
-cv2.namedWindow("SunplusIT", cv2.WND_PROP_FULLSCREEN)        # Create a named window
-cv2.setWindowProperty("SunplusIT", cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+#cv2.namedWindow("SunplusIT", cv2.WND_PROP_FULLSCREEN)        # Create a named window
+#cv2.setWindowProperty("SunplusIT", cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 
 start_time = time.time()
 dt.emptyBG = None
@@ -57,8 +57,8 @@ if __name__ == "__main__":
     width = int(INPUT.get(cv2.CAP_PROP_FRAME_WIDTH))   # float
     height = int(INPUT.get(cv2.CAP_PROP_FRAME_HEIGHT)) # float
 
-    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-    out = cv2.VideoWriter(video_out,fourcc, 30.0, (int(width),int(height)))
+    #fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+    #out = cv2.VideoWriter(video_out,fourcc, 30.0, (int(width),int(height)))
 
     frameID = 0
     while True:
@@ -106,6 +106,7 @@ if __name__ == "__main__":
         cv2.waitKey(1)
 
         if(YOLO is True):
+            yoloStart = time.time()
             print("YOLO start...")
             YOLO = False
             yolo.getObject(frame, labelWant="", drawBox=True, bold=1, textsize=0.6, bcolor=(0,0,255), tcolor=(255,255,255))
@@ -124,7 +125,11 @@ if __name__ == "__main__":
 
                 imgDisplay = dt.display(frame, txtStatus, shoplist)
                 cv2.imshow("SunplusIT", imgDisplay)
-                cv2.waitKey(0)
+                cv2.waitKey(1)
+                if(len(shoplist)>0):
+                    print("YOLo used:" + str(round(time.time()-yoloStart, 3)))
+                    time.sleep(10)
+
                 #cv2.imshow("SunplusIT", imgDisplay)
                 #cv2.waitKey(1)
                 #time.sleep(0)
@@ -135,7 +140,7 @@ if __name__ == "__main__":
         #out.write(frame)
         
 
-        k = cv2.waitKey(0)
+        k = cv2.waitKey(1)
         if k == 0xFF & ord("q"):
             out.release()
             break

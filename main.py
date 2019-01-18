@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 from yoloOpencv import opencvYOLO
 import cv2
 import imutils
@@ -8,12 +9,16 @@ import time
 from libPOS import desktop
 
 yolo = opencvYOLO(modeltype="yolov3-tiny", \
-    objnames="cfg.breads_v3.tiny/obj.names", \
-    weights="cfg.breads_v3.tiny/weights/yolov3-tiny_500000.weights",\
-    cfg="cfg.breads_v3.tiny/yolov3-tiny.cfg")
+    objnames="cfg.breads_fake.tiny/obj.names", \
+    weights="cfg.breads_fake.tiny/weights/yolov3-tiny_70000.weights",\
+    cfg="cfg.breads_fake.tiny/yolov3-tiny.cfg")
 
-labels = {  "a1":["杯子蛋糕", 15], "a2":["丹麥起司",55], "a3":["十勝紅豆",42], "a4":["花生夾心", 26], \
-            "a5":["夾心鬆餅", 42], "a6":["風味布雪", 38] }
+#labels = {  "a1":["杯子蛋糕", 15], "a2":["丹麥起司",55], "a3":["十勝紅豆",42], "a4":["花生夾心", 26], \
+#            "a5":["夾心鬆餅", 42], "a6":["風味布雪", 38] }
+labels = { "b01a":["單片土司", 8], "b01b":["雙片土司", 16], "b01c":["一包土司", 20], "b02":["熱狗夾心", 60], \
+           "b03":["糖霜奶心", 42], "b04":["牛角麵包", 30], "b05":["奶油牛奶條", 55], "b06":["紅豆麵包", 35], \
+           "b07":["花生夾心", 28], "b08":["小圓麵包", 18], "b09":["炸甜甜圈", 30], "b10":["鬆軟捲餅", 52], "b11":["牛肉漢堡", 85] }
+
 idle_checkout = (6, 10)
 media = "bread_test.mp4"
 video_out = "output.avi"
@@ -27,6 +32,61 @@ dt.emptyBG = None
 last_movetime = time.time()  #objects > 0
 YOLO = False  # YOLO detect in this loop?
 txtStatus = ""
+
+def speak(wavfile):
+    os.system('/usr/bin/aplay ' + wavfile)
+
+def dollar_speak(num):
+    strNum = str(num)
+
+    if(num<=99):
+        speak("wav/number/" + str(num) + ".wav")
+    elif(num<=999 and num>99):
+        if(strNum[-2:]=="00"):
+            speak("wav/number/" + strNum[-3:] + ".wav")
+        else:
+            speak("wav/number/100.wav")
+            speak("wav/number/" + strNum[-2:] + ".wav")
+    elif(num<=1999 and num>999):
+        speak("wav/number/1000.wav")
+        speak("wav/number/" + strNum[-3] + "00.wav")
+        speak("wav/number/" + strNum[-2:] + ".wav")
+
+    speak("wav/dollar_long.wav")
+
+def speak_shoplist(itemList):
+    totalPrice = 0
+    for id, item in enumerate(itemList):
+        itemID = item[0]
+        itemName = item[1]
+        itemNum = int(item[3])
+        itemPrice = int(item[2])
+        totalPrice += itemNum*itemPrice
+        print("totalPrice:", totalPrice)
+
+        if(itemID == "b01a"):
+            if(itemNum==2):
+                unit = "2_slice.wav"
+            else:
+                unit = "1_slice.wav"
+
+        elif(itemID == "b01c"):
+            unit = "1_pack.wav"
+
+        else:
+            if(itemNum==2):
+                unit = "2_item.wav"
+            else:
+                unit = "1_item.wav"
+
+        speak("wav/menu/" + itemID + ".wav")
+        #speak("wav/number/" + str(itemNum) + ".wav")
+        speak("wav/" + unit)
+        speak("wav/number/" + str(itemNum*itemPrice) + ".wav")
+        speak("wav/dollar.wav")
+
+    speak("wav/totalis.wav")
+    dollar_speak(totalPrice)
 
 def group(items):
     """
@@ -72,10 +132,10 @@ if __name__ == "__main__":
 
         '''
         yolo.getObject(frame, labelWant="", drawBox=True, bold=1, textsize=0.6, bcolor=(0,0,255), tcolor=(255,255,255))
-        print ("Object counts:", yolo.objCounts)
+        #print ("Object counts:", yolo.objCounts)
         #yolo.listLabels()
-        print("classIds:{}, confidences:{}, labelName:{}, bbox:{}".\
-            format(len(yolo.classIds), len(yolo.scores), len(yolo.labelNames), len(yolo.bbox)) )
+        #print("classIds:{}, confidences:{}, labelName:{}, bbox:{}".\
+        #    format(len(yolo.classIds), len(yolo.scores), len(yolo.labelNames), len(yolo.bbox)) )
         #cv2.imshow("Frame", imutils.resize(frame, width=600))
         '''
 
@@ -108,6 +168,7 @@ if __name__ == "__main__":
         if(YOLO is True):
             yoloStart = time.time()
             print("YOLO start...")
+            speak("wav/start_pos.wav")
             YOLO = False
             yolo.getObject(frame, labelWant="", drawBox=True, bold=1, textsize=0.6, bcolor=(0,0,255), tcolor=(255,255,255))
             #yolo.listLabels()
@@ -128,7 +189,11 @@ if __name__ == "__main__":
                 cv2.waitKey(1)
                 if(len(shoplist)>0):
                     print("YOLo used:" + str(round(time.time()-yoloStart, 3)))
-                    time.sleep(10)
+                    print("Shop list:", shoplist)
+                    cv2.waitKey(1)
+                    speak_shoplist(shoplist)
+
+                    #time.sleep(10)
 
                 #cv2.imshow("SunplusIT", imgDisplay)
                 #cv2.waitKey(1)

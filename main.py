@@ -10,7 +10,7 @@ from libPOS import desktop
 
 yolo = opencvYOLO(modeltype="yolov3-tiny", \
     objnames="cfg.breads_fake.tiny/obj.names", \
-    weights="cfg.breads_fake.tiny/weights/yolov3-tiny_70000.weights",\
+    weights="cfg.breads_fake.tiny/weights/yolov3-tiny_100000.weights",\
     cfg="cfg.breads_fake.tiny/yolov3-tiny.cfg")
 
 #labels = {  "a1":["杯子蛋糕", 15], "a2":["丹麥起司",55], "a3":["十勝紅豆",42], "a4":["花生夾心", 26], \
@@ -24,8 +24,8 @@ media = "bread_test.mp4"
 video_out = "output.avi"
 dt = desktop("images/bg.jpg", "images/bgClick.jpg")
 
-#cv2.namedWindow("SunplusIT", cv2.WND_PROP_FULLSCREEN)        # Create a named window
-#cv2.setWindowProperty("SunplusIT", cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+cv2.namedWindow("SunplusIT", cv2.WND_PROP_FULLSCREEN)        # Create a named window
+cv2.setWindowProperty("SunplusIT", cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 
 start_time = time.time()
 dt.emptyBG = None
@@ -42,11 +42,8 @@ def dollar_speak(num):
     if(num<=99):
         speak("wav/number/" + str(num) + ".wav")
     elif(num<=999 and num>99):
-        if(strNum[-2:]=="00"):
-            speak("wav/number/" + strNum[-3:] + ".wav")
-        else:
-            speak("wav/number/100.wav")
-            speak("wav/number/" + strNum[-2:] + ".wav")
+        speak("wav/number/" + strNum[-3] + "00.wav")
+        speak("wav/number/" + strNum[-2:] + ".wav")
     elif(num<=1999 and num>999):
         speak("wav/number/1000.wav")
         speak("wav/number/" + strNum[-3] + "00.wav")

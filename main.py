@@ -8,21 +8,21 @@ import imutils
 import time
 from libPOS import desktop
 
+#------------------------------------------------------------------------
 yolo = opencvYOLO(modeltype="yolov3-tiny", \
     objnames="cfg.breads_fake.tiny/obj.names", \
     weights="cfg.breads_fake.tiny/weights/yolov3-tiny_100000.weights",\
     cfg="cfg.breads_fake.tiny/yolov3-tiny.cfg")
 
-#labels = {  "a1":["杯子蛋糕", 15], "a2":["丹麥起司",55], "a3":["十勝紅豆",42], "a4":["花生夾心", 26], \
-#            "a5":["夾心鬆餅", 42], "a6":["風味布雪", 38] }
 labels = { "b01a":["單片土司", 8], "b01b":["雙片土司", 16], "b01c":["一包土司", 20], "b02":["熱狗夾心", 60], \
            "b03":["糖霜奶心", 42], "b04":["牛角麵包", 30], "b05":["奶油牛奶條", 55], "b06":["紅豆麵包", 35], \
            "b07":["花生夾心", 28], "b08":["小圓麵包", 18], "b09":["炸甜甜圈", 30], "b10":["鬆軟捲餅", 52], "b11":["牛肉漢堡", 85] }
 
-idle_checkout = (6, 10)
-media = "bread_test.mp4"
+idle_checkout = (8, 10)
 video_out = "output.avi"
 dt = desktop("images/bg.jpg", "images/bgClick.jpg")
+flipFrame = (True,False) #(H, V)
+#-------------------------------------------------------------------------
 
 cv2.namedWindow("SunplusIT", cv2.WND_PROP_FULLSCREEN)        # Create a named window
 cv2.setWindowProperty("SunplusIT", cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
@@ -138,24 +138,28 @@ if __name__ == "__main__":
 
         #objects = dt.getContours(frame, 1200)
         #print("Objects:", objects)
+        if(flipFrame[0] is True):
+            frame = cv2.flip(frame, 1 , dst=None)
+        elif(flipFrame[1] is True):
+            frame = cv2.flip(frame, 0 , dst=None)
 
         if(dt.emptyBG is None or time.time()-dt.emptyBG_time>=0.5):
             dt.emptyBG = frame.copy()
             dt.emptyBG_time = time.time()
             #print("Update BG")
 
-        objects = dt.difference(dt.emptyBG, frame, 1000)
+        objects = dt.difference(dt.emptyBG, frame, 800)
         if(objects>0):
             last_movetime = time.time()
             timeout_move = str(round(time.time()-last_movetime, 0))
-            txtStatus = "move:" + timeout_move
+            txtStatus = "Idle:" + timeout_move
         else:
             waiting = time.time() - last_movetime
             timeout_move = str(round(time.time()-last_movetime, 0))
-            txtStatus = "move:" + timeout_move
+            txtStatus = "Idle:" + timeout_move
 
             if(waiting > idle_checkout[0] and waiting<idle_checkout[1] ):
-                txtStatus = "detecting"
+                txtStatus = "Caculate"
                 YOLO = True
 
         imgDisplay = dt.display(frame.copy(), txtStatus)
@@ -167,8 +171,18 @@ if __name__ == "__main__":
             print("YOLO start...")
             speak("wav/start_pos.wav")
             YOLO = False
-            yolo.getObject(frame, labelWant="", drawBox=True, bold=1, textsize=0.6, bcolor=(0,0,255), tcolor=(255,255,255))
-            #yolo.listLabels()
+            yolo.getObject(frame, labelWant="", drawBox=False, bold=1, textsize=0.6, bcolor=(0,0,255), tcolor=(255,255,255))
+
+
+            for id, label in enumerate(yolo.labelNames):
+                x = yolo.bbox[id][0]
+                y = yolo.bbox[id][1]
+                w = yolo.bbox[id][2]
+                h = yolo.bbox[id][3]
+                cx = int(x+w/3)
+                cy = int(y+h/3)
+                frame = desktop.printText(desktop, txt=labels[label][0], bg=frame, color=(255,255,255,0), size=0.65, pos=(cx,cy), type="Chinese")
+
             #print("classIds:{}, confidences:{}, labelName:{}, bbox:{}".\
             #    format(len(yolo.classIds), len(yolo.scores), len(yolo.labelNames), len(yolo.bbox)) )
             if(len(yolo.labelNames)>0):
@@ -177,6 +191,7 @@ if __name__ == "__main__":
                 shoplist = []
                 for items in types:
                     shoplist.append([items[0], labels[items[0]][0], labels[items[0]][1], len(items)])
+                    #desktop.printText(labels[items[0]][0], frame, color=(255,255,0,0), size=0.6, pos=(0,0), type="Chinese")
 
                 txtStatus = "checkout"
                 print(shoplist)

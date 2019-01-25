@@ -7,6 +7,8 @@ import cv2
 import imutils
 import time
 from libPOS import desktop
+import RPi.GPIO as GPIO 
+GPIO.setmode(GPIO.BCM)
 
 #------------------------------------------------------------------------
 yolo = opencvYOLO(modeltype="yolov3-tiny", \
@@ -23,6 +25,8 @@ video_out = "output.avi"
 dt = desktop("images/bg.jpg", "images/bgClick.jpg")
 flipFrame = (True,False) #(H, V)
 #-------------------------------------------------------------------------
+pinBTN = 5
+GPIO.setup(pinBTN, GPIO.IN)
 
 cv2.namedWindow("SunplusIT", cv2.WND_PROP_FULLSCREEN)        # Create a named window
 cv2.setWindowProperty("SunplusIT", cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
@@ -158,7 +162,7 @@ if __name__ == "__main__":
             timeout_move = str(round(time.time()-last_movetime, 0))
             txtStatus = "Idle:" + timeout_move
 
-            if(waiting > idle_checkout[0] and waiting<idle_checkout[1] ):
+            if( (waiting > idle_checkout[0] and waiting<idle_checkout[1]) or GPIO.input(pinBTN)==1  ):
                 txtStatus = "Caculate"
                 YOLO = True
 
@@ -216,7 +220,6 @@ if __name__ == "__main__":
         #if(video_out!=""):
         #out.write(frame)
         
-
         k = cv2.waitKey(1)
         if k == 0xFF & ord("q"):
             out.release()

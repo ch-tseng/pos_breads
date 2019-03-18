@@ -12,15 +12,14 @@ class desktop:
 
     def display(self, camImg, txtStatus=None, itemList=None):
         itemList_pos = (30, 550)
-        itemList_h = 40
+        itemList_h = 30
         bg = cv2.imread(self.bg)
 
         resized = cv2.resize(camImg, (480, 360))
-        print(bg.shape, resized.shape)
         bg[95:95+resized.shape[0],25:25+resized.shape[1]] = resized
 
         if(txtStatus is not None):
-            cv2.putText(bg, txtStatus, (290,120), cv2.FONT_HERSHEY_COMPLEX, 0.65, (0,255,0), 2)
+            cv2.putText(bg, txtStatus, (290,35), cv2.FONT_HERSHEY_COMPLEX, 0.75, (0,0,255), 2)
 
         price_total = 0
         if(itemList is not None):
@@ -30,17 +29,16 @@ class desktop:
                 txtIMG = cv2.imread("images/products/" + item[0] + ".jpg")
 
                 bg[y:y+txtIMG.shape[0], itemList_pos[1]:itemList_pos[1]+txtIMG.shape[1]] = txtIMG
-                y += itemList_h
                 '''
+                y += itemList_h
+                bg = self.printText(item[1], bg=bg, color=(0,0,0,0), size=0.5, pos=(itemList_pos[1],y), type="Chinese")
 
-                bg = self.printText(item[1], bg=bg, color=(0,0,0,0), size=0.7, pos=(itemList_pos[1],y), type="Chinese")
-
-                cv2.putText(bg, str(id+1)+")", (itemList_pos[1]-30,y+17), cv2.FONT_HERSHEY_COMPLEX, 0.6, (0,0,0), 2)
+                cv2.putText(bg, str(id+1)+")", (itemList_pos[1]-30,y+17), cv2.FONT_HERSHEY_COMPLEX, 0.4, (0,0,0), 2)
                 if(item[3]>1):
-                    cv2.putText(bg, "x "+str(item[3]), (itemList_pos[1]+130,y+17), cv2.FONT_HERSHEY_COMPLEX, 0.6, (0,0,0), 2)
+                    cv2.putText(bg, "x "+str(item[3]), (itemList_pos[1]+130,y+17), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,0,0), 2)
 
                 price = item[2]*item[3]
-                cv2.putText(bg, "$"+str(price), (itemList_pos[1]+180,y+17), cv2.FONT_HERSHEY_COMPLEX, 0.6, (255,0,0), 1)
+                cv2.putText(bg, "$"+str(price), (itemList_pos[1]+180,y+13), cv2.FONT_HERSHEY_COMPLEX, 0.45, (255,0,0), 1)
 
                 price_total += price
 
@@ -107,7 +105,6 @@ class desktop:
             # bounding box on both input images to represent where the two
             # images differ
             area = cv2.contourArea(c)
-            print(area)
             if(area>minSize and area<(img1.shape[0]-20)*(img1.shape[1]-20)):
                 counts += 1
                 (x, y, w, h) = cv2.boundingRect(c)
@@ -132,7 +129,6 @@ class desktop:
         else:
             ## Use simsum.ttf to write Chinese.
             fontpath = "fonts/wt009.ttf"
-            print("TEST", txt)
             font = ImageFont.truetype(fontpath, int(size*10*4))
             img_pil = Image.fromarray(bg)
             draw = ImageDraw.Draw(img_pil)

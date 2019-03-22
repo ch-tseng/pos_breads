@@ -23,7 +23,7 @@ labels_en = { "b01a":["Toast", 0.4], "b01b":["Toasts", 0.8], "b01c":["White brea
 idle_checkout = (8, 10)
 video_out = "output.avi"
 dt = desktop("images/bg.jpg", "images/bgClick.jpg")
-flipFrame = (True,False) #(H, V)
+flipFrame = (True,True) #(H, V)
 lang = "EN"  #TW, EN
 #-------------------------------------------------------------------------
 f = open("detection_type.txt", "r")
@@ -32,9 +32,13 @@ f.close()
 
 if(detection == "USD"):   #BREAD or USD
     yolo = opencvYOLO(modeltype="yolov3-tiny", \
-        objnames="cfg.usd_dollars.tiny/obj.names", \
-        weights="cfg.usd_dollars.tiny/weights/yolov3-tiny_80000.weights",\
-        cfg="cfg.usd_dollars.tiny/yolov3-tiny.cfg")
+        objnames="cfg.usd_dollars_square.tiny/obj.names", \
+        weights="cfg.usd_dollars_square.tiny/weights/yolov3-tiny_60000.weights",\
+        cfg="cfg.usd_dollars_square.tiny/yolov3-tiny.cfg")
+    #yolo = opencvYOLO(modeltype="yolov3-tiny", \
+    #    objnames="cfg.usd_dollars.tiny/obj.names", \
+    #    weights="cfg.usd_dollars.tiny/weights/yolov3-tiny_80000.weights",\
+    #    cfg="cfg.usd_dollars.tiny/yolov3-tiny.cfg")
 
     labels_tw = { "1ca":["1 cent", 0.01], "1cb":["1 cent", 0.01],
                  "5ca":["5 cent", 0.05], "5cb":["5 cent", 0.05],
@@ -286,6 +290,8 @@ if __name__ == "__main__":
         if(YOLO is True):
             yoloStart = time.time()
             print("YOLO start...")
+            cv2.imwrite("labeling/"+str(time.time())+".jpg", frame)
+
             if(lang=="TW"):
                 speak("wav.tw/start_pos.wav")
             else:
@@ -303,9 +309,9 @@ if __name__ == "__main__":
                 cx = int(x+w/3)
                 cy = int(y+h/3)
                 if(lang == "EN"):
-                    frame = desktop.printText(desktop, txt=labels[label][0], bg=frame, color=(255,255,255,0), size=0.65, pos=(cx,cy), type="English")
+                    frame = desktop.printText(desktop, txt=labels[label][0], bg=frame, color=(0,255,0,0), size=0.75, pos=(cx,cy), type="English")
                 else:
-                    frame = desktop.printText(desktop, txt=labels[label][0], bg=frame, color=(255,255,255,0), size=0.65, pos=(cx,cy), type="Chinese")
+                    frame = desktop.printText(desktop, txt=labels[label][0], bg=frame, color=(0,255,0,0), size=0.75, pos=(cx,cy), type="Chinese")
 
             #print("classIds:{}, confidences:{}, labelName:{}, bbox:{}".\
             #    format(len(yolo.classIds), len(yolo.scores), len(yolo.labelNames), len(yolo.bbox)) )

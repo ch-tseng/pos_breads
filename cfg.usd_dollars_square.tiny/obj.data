@@ -1,0 +1,5 @@
+classes= 1
+train  = /home/digits/works/YOLO.projects/cfg.usd_dollars_square.tiny/train.txt
+valid  = /home/digits/works/YOLO.projects/cfg.usd_dollars_square.tiny/test.txt
+names = /home/digits/works/YOLO.projects/cfg.usd_dollars_square.tiny/obj.names
+backup = /home/digits/works/YOLO.projects/cfg.usd_dollars_square.tiny/weights/

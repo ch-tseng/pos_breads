@@ -33,7 +33,7 @@ f.close()
 if(detection == "USD"):   #BREAD or USD
     yolo = opencvYOLO(modeltype="yolov3-tiny", \
         objnames="cfg.usd_dollars_square.tiny/obj.names", \
-        weights="cfg.usd_dollars_square.tiny/weights/yolov3-tiny_60000.weights",\
+        weights="cfg.usd_dollars_square.tiny/weights/yolov3-tiny_260000.weights",\
         cfg="cfg.usd_dollars_square.tiny/yolov3-tiny.cfg")
     #yolo = opencvYOLO(modeltype="yolov3-tiny", \
     #    objnames="cfg.usd_dollars.tiny/obj.names", \
@@ -46,7 +46,7 @@ if(detection == "USD"):   #BREAD or USD
                  "5a":["5 dollars", 5.00], "5b":["5 dollar", 5.00],
                  "10a":["10 dollars", 10.00], "10b":["10 dollar", 10.00],
                  "20a":["20 dollars", 20.00], "20b":["20 dollar", 20.00],
-                 "100a":["100 dollars", 5.00], "100b":["100 dollar", 100.00],
+                 "100a":["100 dollars", 100.00], "100b":["100 dollars", 100.00],
                  "25da":["2.5 dollars", 2.50], "25db":["2.5 dollars", 2.50] }
 
     labels_en = { "1ca":["1 cent", 0.01], "1cb":["1 cent", 0.01],
@@ -55,7 +55,7 @@ if(detection == "USD"):   #BREAD or USD
                  "5a":["5 dollars", 5.00], "5b":["5 dollar", 5.00],
                  "10a":["10 dollars", 10.00], "10b":["10 dollar", 10.00],
                  "20a":["20 dollars", 20.00], "20b":["20 dollar", 20.00],
-                 "100a":["100 dollars", 5.00], "100b":["100 dollar", 100.00],
+                 "100a":["100 dollars", 100.00], "100b":["100 dollars", 100.00],
                  "25da":["2.5 dollars", 2.50], "25db":["2.5 dollars", 2.50] }
 
 else:
@@ -283,7 +283,7 @@ if __name__ == "__main__":
                 txtStatus = "Caculate"
                 YOLO = True
 
-        imgDisplay = dt.display(frame.copy(), txtStatus)
+        imgDisplay = dt.display(detection, frame.copy(), txtStatus)
         cv2.imshow("SunplusIT", imgDisplay)
         cv2.waitKey(1)
 
@@ -326,11 +326,11 @@ if __name__ == "__main__":
                 txtStatus = "checkout"
                 print(shoplist)
 
-                imgDisplay = dt.display(frame, txtStatus, shoplist)
+                imgDisplay = dt.display(detection, frame, txtStatus, shoplist)
                 cv2.imshow("SunplusIT", imgDisplay)
                 cv2.waitKey(1)
                 if(len(shoplist)>0):
-                    print("YOLo used:" + str(round(time.time()-yoloStart, 3)))
+                    print("YOLO used:" + str(round(time.time()-yoloStart, 3)))
                     print("Shop list:", shoplist)
                     cv2.waitKey(1)
                     speak_shoplist(shoplist)

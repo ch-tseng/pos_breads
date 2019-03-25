@@ -10,8 +10,8 @@ class desktop:
         self.bg = bg_path
         self.click_bg = cv2.imread(click_bg_path)
 
-    def display(self, camImg, txtStatus=None, itemList=None):
-        itemList_pos = (30, 550)
+    def display(self, detect_type, camImg, txtStatus=None, itemList=None):
+        itemList_pos = (60, 550)
         itemList_h = 30
         bg = cv2.imread(self.bg)
 
@@ -20,6 +20,11 @@ class desktop:
 
         if(txtStatus is not None):
             cv2.putText(bg, txtStatus, (290,35), cv2.FONT_HERSHEY_COMPLEX, 0.75, (0,0,255), 2)
+
+        if(detect_type=="USD"):
+            cv2.putText(bg, "[banknote]", (620,40), cv2.FONT_HERSHEY_COMPLEX, 0.75, (255,0,0), 2)
+        else:
+            cv2.putText(bg, "[bread]", (620,40), cv2.FONT_HERSHEY_COMPLEX, 0.75, (255,0,0), 2)
 
         price_total = 0
         if(itemList is not None):
@@ -44,7 +49,7 @@ class desktop:
 
             total = cv2.imread("images/total.jpg")
             bg[410:410+total.shape[0], 515:515+total.shape[1]] = total
-            cv2.putText(bg, "$"+str(price_total), (660,395+total.shape[0]), cv2.FONT_HERSHEY_COMPLEX, 0.75, (255,0,0), 2)
+            cv2.putText(bg, "$"+str(round(price_total,2)), (660,395+total.shape[0]), cv2.FONT_HERSHEY_COMPLEX, 0.75, (255,0,0), 2)
         return bg
         #cv2.imshow(self.win, bg)
         #cv2.waitKey(1)
